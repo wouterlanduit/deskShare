@@ -13,8 +13,6 @@ QDataStream& operator>>(QDataStream& in, Event& ev){
     qint32 type;
     QString mess;
 
-    //TODO : file
-
     in >> type >> mess;
 
     ev = Event((Event::Type)type, mess);
