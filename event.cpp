@@ -1,28 +1,30 @@
 #include "event.h"
+#include <iostream>
+#include <string.h>
 
-Event::Event(Type type, QString mess){
-    this->type = type;
-    this->mess = mess;
-}
+#include <QDebug>
 
-QDataStream& operator<<(QDataStream& out, const Event& ev){
-    qint32 type = (qint32) ev.type;
-    out << type << ev.mess;
+using namespace std;
+
+QDataStream& Event::doprint(QDataStream& out) const{
+    qint32 type = (qint32) this->type;
+    out << type << this->mess;
 
     return out;
 }
 
-QDataStream& operator>>(QDataStream& in, Event& ev){
+QDataStream& Event::getInput(QDataStream& in){
     qint32 type;
     QString mess;
 
     in >> type >> mess;
 
-    ev = Event((Event::Type)type, mess);
+    this->type = (Event::Type)type;
+    this->mess = mess;
 
     return in;
 }
 
 void Event::showDebug(){
-    qDebug() << type << mess;
+    qDebug() << "type " << this->type << ": " << this->mess << "(event)";
 }

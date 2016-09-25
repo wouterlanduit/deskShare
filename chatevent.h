@@ -4,14 +4,16 @@
 #include "event.h"
 
 
-class ChatEvent : public event{
+class ChatEvent : public Event{
+protected:
+    virtual QDataStream& doprint(QDataStream& out) const;
+    virtual QDataStream& getInput(QDataStream& in);
 public:
     ChatEvent():Event(Event::CHAT, ""){}
 
     ChatEvent(QString msg):Event(Event::CHAT, msg){}
 
-    QString getMsg(){ return this->msg; }
-    void setMsg(QString msg){ this->msg = msg; }
+    virtual void showDebug();
 
 };
 

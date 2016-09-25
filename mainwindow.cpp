@@ -8,28 +8,19 @@
 #include "mousepoller.h"
 #include "socketlistener.h"
 #include "network.h"
+#include "event.h"
+#include "chatevent.h"
+#include "fileevent.h"
+#include "transferwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
-    //setMouseTracking(true);
-
-    /*QPointF point = QPointF(100,100);
-
-    QMouseEvent event = QMouseEvent::QMouseEvent(
-                QEvent::MouseMove,
-                point,
-                Qt::NoButton,
-                Qt::NoButton,
-                Qt::NoModifier);
-    event.globalY();
-
-
-    FollowMouse* dialog = new FollowMouse();
-    dialog->exec();*/
-
     this->mp = NULL;
     this->nw = NULL;
+
+    //TransferWindow* wind = new TransferWindow();
+    //wind->exec();
 }
 
 MainWindow::~MainWindow(){
@@ -55,7 +46,8 @@ void MainWindow::on_startButton_clicked(){  // startknop disabelen
         mp->setLabel(this->ui->coords);
         this->mp->start();
 
-        nw->hello();
+        //nw->hello();
+        nw->sendEvent(ChatEvent("HALLO"));
         //nw->sendEvent(Event(Event::NAME, "name"));
     }
 }
@@ -68,6 +60,8 @@ void MainWindow::on_stopButton_clicked(){
 void MainWindow::on_actionStart_server_triggered(){
     qDebug("Starting server...");
     nw = new Network(1025);
+
+    // TODO : message if server is up.
 }
 
 // check socket state:
@@ -80,9 +74,11 @@ void MainWindow::on_actionConnect_triggered(){
     // TODO create dialog window
 
     QHostAddress ip("127.0.0.1");
+    nw = new Network();
     nw->connect(ip, 1025);
 
-    //TODO create window that allows sending stuff
+    // TODO : message if connection is established
+    // TODO : create window that allows sending stuff
 
 
 }

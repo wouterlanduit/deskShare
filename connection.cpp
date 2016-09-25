@@ -1,13 +1,8 @@
 #include "connection.h"
 #include "event.h"
+#include "transferwindow.h"
 #include <QDataStream>
 #include <QString>
-
-Connection::Connection(QTcpSocket *socket, Network *network, QString name){
-    this->socket = socket;
-    this->network = network;
-    this->person = name;
-}
 
 void Connection::sendHello(){
     if(this->isConnected()){
@@ -26,7 +21,11 @@ void Connection::send(Event& e){
 
     out << e;
     this->write(mess);
+}
 
+Event* Connection::receive(){
+    //TODO implement en vanuit network oproepen
+    return NULL;
 }
 
 void Connection::write(QByteArray& mess){
@@ -41,4 +40,13 @@ void Connection::write(QByteArray& mess){
 
 bool Connection::isConnected(){
     return this->socket != NULL && this->socket->state() == QTcpSocket::ConnectedState;
+}
+
+void Connection::respondSocketState(QAbstractSocket::SocketState state){
+    switch(state){
+    case QAbstractSocket::ConnectedState:
+        this->tfw = TransferWindow::construct(this);                    // via factory method: this as argument is unsafe?
+        this->tfw->exec();
+        break;
+    }
 }

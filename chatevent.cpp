@@ -1,25 +1,32 @@
 #include "chatevent.h"
 #include "event.h"
 
-QDataStream& operator<<(QDataStream& out, const Event& ev){
-    qint32 type = (qint32) ev.type;
+#include <QDebug>
 
-    out << type << ev.mess;
+QDataStream& ChatEvent::doprint(QDataStream& out) const{
+    qint32 type = (qint32) this->type;
+    out << type << this->mess;
+
+    qDebug("LOG:\tdoPrint() (ChatEvent)");
 
     return out;
 }
 
-QDataStream& operator>>(QDataStream& in, Event& ev){
+QDataStream& ChatEvent::getInput(QDataStream& in){
     qint32 type;
     QString mess;
 
     in >> type >> mess;
 
-    ev = Event((Event::Type)type, mess);
+    //*this = Event((Event::Type)type, mess);     //TODO: opzoeken dereferencing this (veilig?)
+
+    this->type = (Event::Type)type;
+    this->mess = mess;
+
 
     return in;
 }
 
-void FileEvent::showDebug(){
-    qDebug() << this->type << this->mess;
+void ChatEvent::showDebug(){
+    qDebug() << "type " << this->type << ": " << this->mess << "(chatevent)";
 }

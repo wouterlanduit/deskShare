@@ -1,6 +1,11 @@
 #include "fileevent.h"
 #include "event.h"
 
+#include <iostream>
+#include <fstream>
+
+#include <QDebug>
+
 QFile* FileEvent::getFile(){
     return this->file;
 }
@@ -9,17 +14,22 @@ void FileEvent::setFile(QFile* f){
     this->file = f;
 }
 
-QDataStream& operator<<(QDataStream& out, const Event& ev){
-    qint32 type = (qint32) ev.type;
+QDataStream& FileEvent::doprint(QDataStream& out) const{
+    qint32 type = (qint32) this->type;
 
     // TODO : file
 
-    out << type << ev.mess;
+    // copy a file      // http://stackoverflow.com/questions/10195343/copy-a-file-in-a-sane-safe-and-efficient-way
+    // std::ifstream  src("from.ogv", std::ios::binary);
+    // std::ofstream  dst("to.ogv",   std::ios::binary);
+    // dst << src.rdbuf();
+
+    out << type << this->mess;
 
     return out;
 }
 
-QDataStream& operator>>(QDataStream& in, Event& ev){
+QDataStream& FileEvent::getInput(QDataStream& in){
     qint32 type;
     QString mess;
 
@@ -27,11 +37,13 @@ QDataStream& operator>>(QDataStream& in, Event& ev){
 
     in >> type >> mess;
 
-    ev = Event((Event::Type)type, mess);
+    this->type = (Event::Type)type;
+    this->mess = mess;
 
     return in;
 }
 
+
 void FileEvent::showDebug(){
-    qDebug() << this->type << this->mess;
+    qDebug() << "type " << this->type << ": " << this->mess << "(fileevent)";
 }

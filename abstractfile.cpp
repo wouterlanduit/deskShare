@@ -1,6 +1,3 @@
-#include "file.h"
+#include "abstractfile.h"
 
-File::File()
-{
-
-}
+;

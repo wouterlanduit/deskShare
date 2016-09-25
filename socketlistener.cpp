@@ -1,5 +1,6 @@
 #include "socketlistener.h"
 #include "event.h"
+#include "chatevent.h"
 
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -27,14 +28,7 @@ void SocketListener::acceptConnection(){
     tcpServerConnection = tcpServer->nextPendingConnection();
 
     //TODO: socket als connection toevoegen aan network
-
-    switch(tcpServer->serverPort()){
-    case 80:
-        QObject::connect(tcpServerConnection, SIGNAL(readyRead()),this, SLOT(httpRequest()));
-        break;
-    default:
-        QObject::connect(tcpServerConnection, SIGNAL(readyRead()),this, SLOT(displayRequest()));
-    }
+    QObject::connect(tcpServerConnection, SIGNAL(readyRead()),this, SLOT(handleRequest()));
 
     QObject::connect(tcpServerConnection, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
@@ -47,48 +41,50 @@ void SocketListener::acceptConnection(){
 }
 // http://doc.qt.io/qt-5/qtnetwork-loopback-dialog-cpp.html
 
-void SocketListener::httpRequest(){
+
+void SocketListener::handleRequest(){   //in displayRequest steken
     displayRequest();
 
-    this->httpResponse();
+    QByteArray request = tcpServerConnection->readAll();        // TODO: opzoeken wat readAll precies doet en of er geen beter alternatief is
 
-}
-
-void SocketListener::httpResponse(){
-    qDebug("<<<RESPONSE>>>");
-    //QByteArray response = QByteArray("HTTP/1.1 404 Not Found/r/n/r/n");
-    QByteArray response = QByteArray("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n<!DOCTYPE html>\r\n<html><body>HELLO WORLD</body></html>");
-    //QDataStream out(&response, QIODevice::WriteOnly);
-    //out.setVersion(QDataStream::Qt_4_0);
-
-    //out << "HTTP/1.1 200 OK/r/n/r/n";
-    //out << "hello";
-
-    qDebug(response);
-
-    tcpServerConnection->write(response);
-    tcpServerConnection->flush();
-    tcpServerConnection->disconnectFromHost();      // when this is not here, the browser keeps waiting for more info before it show anything
-}
-
-void SocketListener::displayRequest(){
-    qDebug("<<<REQUEST>>>");
-    QByteArray request = tcpServerConnection->readAll();
-
-    // qint32 type;
-    // QString mess;
-    Event ev;
-
-    QDataStream in(&request, QIODevice::ReadOnly);
-    in.setVersion(QDataStream::Qt_4_0);
+    QDataStream inType(&request, QIODevice::ReadOnly);
+    inType.setVersion(QDataStream::Qt_4_0);
+    QDataStream inAll(&request, QIODevice::ReadOnly);
+    inAll.setVersion(QDataStream::Qt_4_0);
 
     // wat als input niet in juiste formaat??
     // als formaat nie juist is, treedt geen error op, hij vult gewoon in zo goed als mogelijk (maar het is wel verkeerd)
 
-    in >> ev;
+
+    qint32 type;
+
+    inType >> type;
+
+    Event* event;
+
+    switch((Event::Type)type){
+    case Event::CHAT:
+        event = new ChatEvent();
+        break;
+    case Event::FILE:
+
+        break;
+    default:
+        event = new Event();
+    }
+
+    inAll >> *event;
+
+    //in >> ev;
+
+    event->showDebug();
 
     qDebug(request);
 
+}
+
+void SocketListener::displayRequest(){
+    qDebug("<<<REQUEST>>>");
 }
 
 void SocketListener::displayError(QAbstractSocket::SocketError socketError){

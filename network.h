@@ -4,6 +4,7 @@
 #include <QHostAddress>
 
 #include "socketlistener.h"
+#include "httpsocketlistener.h"
 #include "connection.h"
 
 class Network{
@@ -12,10 +13,27 @@ private:
     Connection* cn;
 
 public:
-    Network(int port);
+    // constructors
+    Network(){
+        sl = NULL;
+        cn = NULL;
+    }
 
-    Connection connect(QHostAddress ip,int port);
-    Connection connect(QTcpSocket*);
+    Network(int port){
+        switch(port){
+        case 80:
+            sl = new HttpSocketListener(this);
+            break;
+        default:
+            sl = new SocketListener(port, this);
+        }
+
+        cn = NULL;
+    }
+
+    // methods
+    void connect(QHostAddress ip,int port);
+    void connect(QTcpSocket*);
 
     void disconnect();
 

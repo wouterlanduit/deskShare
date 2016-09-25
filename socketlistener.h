@@ -5,25 +5,25 @@
 
 class Network;
 
-class SocketListener:public QObject{
+class SocketListener : public QObject{
 
     Q_OBJECT
 
-private:
+protected:
     QTcpServer* tcpServer;
     Network* netwerk;
     QTcpSocket* tcpServerConnection;
 
-    void httpResponse();
-
 public:
-    SocketListener(Network* nw);
     SocketListener(int port, Network* nw);
+    ~SocketListener(){
+        if(tcpServer) delete tcpServer;
+    }
 
-private slots:
-    void displayRequest();
-    void httpRequest();
+protected slots:
     void acceptConnection();
+    virtual void handleRequest();
+    virtual void displayRequest();
     void displayError(QAbstractSocket::SocketError socketError);
 };
 

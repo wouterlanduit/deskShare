@@ -24,7 +24,12 @@ SOURCES += main.cpp\
     event.cpp \
     fileevent.cpp \
     chatevent.cpp \
-    transferwindow.cpp
+    transferwindow.cpp \
+    abstractfile.cpp \
+    singlefile.cpp \
+    folder.cpp \
+    httpsocketlistener.cpp \
+    fileenvelope.cpp
 
 HEADERS  += mainwindow.h \
         followmouse.h \
@@ -36,6 +41,12 @@ HEADERS  += mainwindow.h \
     event.h \
     fileevent.h \
     chatevent.h \
-    transferwindow.h
+    transferwindow.h \
+    constants.h \
+    abstractfile.h \
+    singlefile.h \
+    folder.h \
+    httpsocketlistener.h \
+    fileenvelope.h
 
 FORMS    += mainwindow.ui
