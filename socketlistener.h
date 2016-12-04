@@ -2,6 +2,7 @@
 #define SOCKETLISTENER_H
 
 #include <QTcpServer>
+#include <QString>
 
 class Network;
 
@@ -12,13 +13,17 @@ class SocketListener : public QObject{
 protected:
     QTcpServer* tcpServer;
     Network* netwerk;
-    QTcpSocket* tcpServerConnection;
+    QTcpSocket* tcpServerConnection;    //TODO: wegdoen
 
 public:
+    SocketListener(Network* nw);
     SocketListener(int port, Network* nw);
     ~SocketListener(){
         if(tcpServer) delete tcpServer;
     }
+
+    //methods
+    QString showAddress(){ return tcpServer ? tcpServer->serverAddress().toString() + ":" + QString::number(tcpServer->serverPort()) : ""; }
 
 protected slots:
     void acceptConnection();

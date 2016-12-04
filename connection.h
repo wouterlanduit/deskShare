@@ -8,7 +8,7 @@
 #include <QDialog>
 #include <QHostAddress>
 #include <QAbstractSocket>
-
+#include <QMutex>
 
 class Network;
 
@@ -19,12 +19,18 @@ class Connection : public QObject{
     Q_OBJECT
     Q_DISABLE_COPY(Connection)
 
+private:
+    void startTransferWindow(){
+        this->tfw = TransferWindow::construct(this);
+        this->tfw->show();
+    }
+
 protected:
     QTcpSocket* socket;
     Network* network;
     QString person;     // name of the person you are connected to
     TransferWindow* tfw;
-
+    QMutex* mutex;
 
 public:
     // constructors en destructor
@@ -32,20 +38,15 @@ public:
         this->socket = socket;
         this->network = network;
         this->person = name;
+        this->tfw = NULL;
+        this->mutex = new QMutex();
     }
 
     ~Connection(){
         if(tfw) delete tfw;
     }
 
-    static Connection* construct(QTcpSocket* socket, Network* network, QString name){
-        Connection* conn = new Connection(socket, network, name);
-
-        QObject::connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-                conn, SLOT(respondSocketState(QAbstractSocket::SocketState)));
-
-        return conn;
-    }
+    static Connection* construct(QTcpSocket* socket, Network* network, QString name);
 
     //getters/setters
     QString getPerson(){ return this->person; }
@@ -68,6 +69,8 @@ public:
 
 protected slots:
     void respondSocketState(QAbstractSocket::SocketState state);
+    void handleRequest();
+    void displayError(QAbstractSocket::SocketError socketError);
 
 };
 

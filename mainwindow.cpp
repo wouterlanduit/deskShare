@@ -1,8 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "QMouseEvent"
-#include "QPoint"
+#include <QMouseEvent>
+#include <QPoint>
 
 #include "followmouse.h"
 #include "mousepoller.h"
@@ -12,15 +12,14 @@
 #include "chatevent.h"
 #include "fileevent.h"
 #include "transferwindow.h"
+#include "constants.h"
+#include "addressdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
     this->mp = NULL;
     this->nw = NULL;
-
-    //TransferWindow* wind = new TransferWindow();
-    //wind->exec();
 }
 
 MainWindow::~MainWindow(){
@@ -61,6 +60,9 @@ void MainWindow::on_actionStart_server_triggered(){
     qDebug("Starting server...");
     nw = new Network(1025);
 
+    SocketListener* sl = nw->getSocketListener();
+    sl ? ui->ServerLocation->setText(nw->getSocketListener()->showAddress()) : ui->ServerLocation->setText("");
+
     // TODO : message if server is up.
 }
 
@@ -73,9 +75,12 @@ void MainWindow::on_actionConnect_triggered(){
 
     // TODO create dialog window
 
-    QHostAddress ip("127.0.0.1");
-    nw = new Network();
-    nw->connect(ip, 1025);
+    AddressDialog* dial = AddressDialog::construct();
+    if(dial->exec()){
+        QHostAddress ip("127.0.0.1");
+        nw = new Network();
+        nw->connect(ip, 1025);
+    }
 
     // TODO : message if connection is established
     // TODO : create window that allows sending stuff

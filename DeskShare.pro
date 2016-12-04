@@ -29,7 +29,10 @@ SOURCES += main.cpp\
     singlefile.cpp \
     folder.cpp \
     httpsocketlistener.cpp \
-    fileenvelope.cpp
+    fileenvelope.cpp \
+    eventenvelope.cpp \
+    addressdialog.cpp \
+    ipcontrol.cpp
 
 HEADERS  += mainwindow.h \
         followmouse.h \
@@ -47,6 +50,9 @@ HEADERS  += mainwindow.h \
     singlefile.h \
     folder.h \
     httpsocketlistener.h \
-    fileenvelope.h
+    fileenvelope.h \
+    eventenvelope.h \
+    addressdialog.h \
+    ipcontrol.h
 
 FORMS    += mainwindow.ui

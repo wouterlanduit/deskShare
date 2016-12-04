@@ -13,16 +13,15 @@ QDataStream& ChatEvent::doprint(QDataStream& out) const{
 }
 
 QDataStream& ChatEvent::getInput(QDataStream& in){
-    qint32 type;
+    /*qint32 type;
     QString mess;
 
     in >> type >> mess;
 
-    //*this = Event((Event::Type)type, mess);     //TODO: opzoeken dereferencing this (veilig?)
-
     this->type = (Event::Type)type;
-    this->mess = mess;
+    this->mess = mess;*/
 
+    in >> (this->mess);
 
     return in;
 }

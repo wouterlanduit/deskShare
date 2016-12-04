@@ -2,6 +2,7 @@
 #define NETWORK_H
 
 #include <QHostAddress>
+#include <QString>
 
 #include "socketlistener.h"
 #include "httpsocketlistener.h"
@@ -30,6 +31,9 @@ public:
 
         cn = NULL;
     }
+
+    //getters
+    SocketListener* getSocketListener(){ return this->sl; }
 
     // methods
     void connect(QHostAddress ip,int port);

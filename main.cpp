@@ -12,3 +12,5 @@ int main(int argc, char *argv[])
 
 // TODO
 // 1. protocol om opeenvolgende pakketten te herkennen
+
+// 2. elke connection aan netwerk hangen en allemaal sluiten als applicatie sluit

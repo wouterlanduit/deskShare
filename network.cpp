@@ -24,7 +24,6 @@ void Network::hello(){
     }else{
         qDebug() << ERR_NO_CONNECTION;
     }
-
 }
 
 void Network::sendEvent(Event& ev){
