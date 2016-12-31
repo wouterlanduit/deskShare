@@ -18,6 +18,9 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
+    //ui->stopButton->setDisabled(true);
+    mousePollerMutex = new QMutex();
+
     this->mp = NULL;
     this->nw = NULL;
 }
@@ -29,36 +32,46 @@ MainWindow::~MainWindow(){
         mp->wait(100); // wait untill thread has finished or untill timeout
         delete mp;
     }
+    delete mousePollerMutex;
 }
 
 // http://stackoverflow.com/questions/1935021/getting-mousemoveevents-in-qt
 
 void MainWindow::on_startButton_clicked(){  // startknop disabelen
-    if(this->mp != NULL && !this->mp->isFinished()){
+    mousePollerMutex->lock();
+    //ui->startButton->setDisabled(true);
+    if(this->mp != NULL && !this->mp->isFinished()){    // 2 keer snel na elkaar op start klikken leidt tot problemen
         qDebug("already running");
-        // TODO 2 keer na elkaar op start klikken leidt toch nog tot een crash na het printen van deze boodschap
     }else{
         if(this->mp != NULL){
             delete mp;
+            mp = NULL;
         }
         this->mp = new MousePoller(50);
         mp->setLabel(this->ui->coords);
         this->mp->start();
-
-        //nw->hello();
-        nw->sendEvent(ChatEvent("HALLO"));
-        //nw->sendEvent(Event(Event::NAME, "name"));
     }
+    //ui->stopButton->setDisabled(false);
+    mousePollerMutex->unlock();
 }
 
 void MainWindow::on_stopButton_clicked(){
-    if(this->mp != NULL)    // deze knop disablen ipv met if te werken
+    mousePollerMutex->lock();
+    //ui->stopButton->setDisabled(true);
+    if(this->mp != NULL){    // deze knop disablen ipv met if te werken
         this->mp->end();
+    }
+    //ui->startButton->setDisabled(false);
+    mousePollerMutex->unlock();
 }
 
 void MainWindow::on_actionStart_server_triggered(){
-    qDebug("Starting server...");
-    nw = new Network(1025);
+    if(nw == NULL){
+        qDebug("Starting server...");
+        nw = new Network(1025);
+    }else{
+        qDebug("Server already running...");
+    }
 
     SocketListener* sl = nw->getSocketListener();
     sl ? ui->ServerLocation->setText(nw->getSocketListener()->showAddress()) : ui->ServerLocation->setText("");

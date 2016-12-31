@@ -1,6 +1,7 @@
 #include "transferwindow.h"
 #include "connection.h"
 #include "chatevent.h"
+#include "dropbox.h"
 #include <iostream>
 #include <QHostAddress>
 #include <QAbstractSocket>
@@ -24,6 +25,8 @@ TransferWindow* TransferWindow::construct(Connection *conn){
 
     wind->putTogether();
 
+    QObject::connect(wind, SIGNAL(finished(int)), wind, SLOT(closeConnection()));
+
     return wind;
 }
 
@@ -40,11 +43,12 @@ void TransferWindow::setupChatBox(){
 }
 
 void TransferWindow::setupDropBox(){
-    this->dropBox = new QLabel();
-    this->dropBox->setText("Drop content here.");
+    this->dropBox = new DropBox();
+    //this->dropBox = new QLabel();
+    //this->dropBox->setText("Drop content here.");
     this->dropBox->setGeometry(QRect(0, 0, this->width(), this->height()-60));
-    this->dropBox->setAlignment(Qt::AlignCenter);
-    this->dropBox->setStyleSheet("border: 2px dashed black; background: grey");
+    //this->dropBox->setAlignment(Qt::AlignCenter);
+    //this->dropBox->setStyleSheet("border: 2px dashed black; background: grey");*/
     //TODO zoeken om kleiner te maken
 }
 
@@ -60,4 +64,8 @@ void TransferWindow::sendChat(){
     QString chatMsg = chatInput->toPlainText();
     this->getConnection()->send(ChatEvent(chatMsg));
     chatInput->clear();
+}
+
+void TransferWindow::closeConnection(){
+    this->conn->close();
 }

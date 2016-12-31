@@ -43,7 +43,7 @@ public:
     }
 
     ~Connection(){
-        if(tfw) delete tfw;
+        //if(tfw) delete tfw;
     }
 
     static Connection* construct(QTcpSocket* socket, Network* network, QString name);
@@ -66,11 +66,13 @@ public:
     Event* receive();
     bool isConnected();
     void write(QByteArray& mess);
+    void close();
 
 protected slots:
     void respondSocketState(QAbstractSocket::SocketState state);
     void handleRequest();
     void displayError(QAbstractSocket::SocketError socketError);
+    void socketDisconnected();
 
 };
 

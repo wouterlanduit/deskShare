@@ -16,7 +16,7 @@ QDataStream& FileEnvelope::writeToOut(QDataStream& out) const{
 QDataStream& FileEnvelope::readFromIn(QDataStream& in){
     qint32 type;
 
-    in >> type;     // werkt dit? of is in volledig leeg??
+    in >> type;
 
     switch((FileEnvelope::AbstractFileType)type){
     case FileEnvelope::SINGLEFILE:

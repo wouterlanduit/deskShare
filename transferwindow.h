@@ -1,6 +1,8 @@
 #ifndef TRANSFERWINDOW_H
 #define TRANSFERWINDOW_H
 
+#include "dropbox.h"
+
 #include <QDialog>
 #include <QPushButton>
 #include <QTextEdit>
@@ -20,7 +22,7 @@ private:
     QTextEdit* chatInput;
     QPushButton* sendButton;
 
-    QLabel* dropBox;
+    DropBox* dropBox;
     QVBoxLayout* VLayout;
 
 public:
@@ -30,7 +32,7 @@ public:
     }
 
     ~TransferWindow(){      //TODO: is dit nodig? of verwijderd QDialog al zijn kinderen bij delete
-        //delete conn;
+        qDebug("TransferWindow::~TransferWindow()");
         delete chatBox;
         delete chatInput;
         delete sendButton;
@@ -48,6 +50,9 @@ public:
 
 public slots:
     void sendChat();
+
+private slots:
+    void closeConnection();
 };
 
 #endif // TRANSFERWINDOW_H

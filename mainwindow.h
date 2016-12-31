@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMutex>
 
 #include "mousepoller.h"
 #include "network.h"
@@ -30,6 +31,7 @@ private:
     Ui::MainWindow *ui;
     MousePoller* mp;
     Network* nw;
+    QMutex* mousePollerMutex;
 };
 
 #endif // MAINWINDOW_H

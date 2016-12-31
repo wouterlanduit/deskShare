@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     fileenvelope.cpp \
     eventenvelope.cpp \
     addressdialog.cpp \
-    ipcontrol.cpp
+    ipcontrol.cpp \
+    dropbox.cpp
 
 HEADERS  += mainwindow.h \
         followmouse.h \
@@ -49,10 +50,11 @@ HEADERS  += mainwindow.h \
     abstractfile.h \
     singlefile.h \
     folder.h \
-    httpsocketlistener.h \
     fileenvelope.h \
     eventenvelope.h \
     addressdialog.h \
-    ipcontrol.h
+    ipcontrol.h \
+    httpsocketlistener.h \
+    dropbox.h
 
 FORMS    += mainwindow.ui

@@ -39,7 +39,7 @@ public:
     void connect(QHostAddress ip,int port);
     void connect(QTcpSocket*);
 
-    void disconnect();
+    void disconnect(Connection* conn);
 
     void hello();
     void sendEvent(Event& ev);

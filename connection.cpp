@@ -4,6 +4,7 @@
 #include "fileevent.h"
 #include "eventenvelope.h"
 #include "transferwindow.h"
+#include "network.h"
 #include <QDataStream>
 #include <QString>
 
@@ -15,7 +16,8 @@ Connection* Connection::construct(QTcpSocket* socket, Network* network, QString 
     QObject::connect(socket, SIGNAL(readyRead()),conn, SLOT(handleRequest()));
     QObject::connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
             conn, SLOT(displayError(QAbstractSocket::SocketError)));
-    QObject::connect(socket, &QAbstractSocket::disconnected, socket, &QObject::deleteLater);
+    //QObject::connect(socket, &QAbstractSocket::disconnected, socket, &QObject::deleteLater);
+    QObject::connect(socket, SIGNAL(disconnected()), conn, SLOT(socketDisconnected()));
 
     conn->mutex->lock();
     if(conn->isConnected() && conn->tfw == NULL){
@@ -65,6 +67,21 @@ bool Connection::isConnected(){
     return this->socket != NULL && this->socket->state() == QTcpSocket::ConnectedState;
 }
 
+void Connection::close(){
+    //TODO: implement
+    // delete tfw
+    //delete this->tfw;
+
+    // close TCP socket
+    if(this->isConnected()){
+        // TODO what if connection is closed here?
+        this->socket->disconnectFromHost();     //delete through deleteLater (see construct)
+    }
+
+    // delete this object (how?????)
+    this->network->disconnect(this);
+}
+
 void Connection::respondSocketState(QAbstractSocket::SocketState state){
     switch(state){
     case QAbstractSocket::ConnectedState:
@@ -80,52 +97,36 @@ void Connection::respondSocketState(QAbstractSocket::SocketState state){
 void Connection::handleRequest(){
     QByteArray request = socket->readAll();        // TODO: opzoeken wat readAll precies doet en of er geen beter alternatief is
 
-    QDataStream inType(&request, QIODevice::ReadOnly);
-    inType.setVersion(QDataStream::Qt_4_0);
-    QDataStream inAll(&request, QIODevice::ReadOnly);
-    inAll.setVersion(QDataStream::Qt_4_0);
+    QDataStream in(&request, QIODevice::ReadOnly);
+    in.setVersion(QDataStream::Qt_4_0);
 
     // wat als input niet in juiste formaat??
     // als formaat nie juist is, treedt geen error op, hij vult gewoon in zo goed als mogelijk (maar het is wel verkeerd)
 
-    //TODO: vervangen door event enveloppe
-
-    /*qint32 type;
-    inType >> type;
-
-    Event* event;
-
-    switch((Event::Type)type){
-    case Event::CHAT:
-        event = new ChatEvent();
-        break;
-    case Event::FILE:
-
-        break;
-    default:
-        event = new Event();
-    }
-
-    inAll >> *event;
-
-    event->showDebug();
-
-    qDebug(request);*/
-
     EventEnvelope ee = EventEnvelope();
 
-    inAll >> ee;
+    in >> ee;
 
     ee.getEvent()->showDebug();
 
 }
 
 void Connection::displayError(QAbstractSocket::SocketError socketError){
-    if (socketError == QTcpSocket::RemoteHostClosedError)
-        return;
+    qDebug("Connection::displayError()");
+    switch(socketError)
+    {
+    case QTcpSocket::RemoteHostClosedError:
+        this->tfw->setWindowTitle(this->getPerson() + "(disconnected)");
+        break;
 
-    qDebug("displayError()");
+    default:
+        this->socket->close();
+    }
+}
 
-    this->socket->close();
+void Connection::socketDisconnected(){
+    qDebug("Connection::socketDisconnected()");
+    QObject::connect(socket, &QAbstractSocket::disconnected, socket, &QObject::deleteLater);
+    this->socket = NULL;
 }
 

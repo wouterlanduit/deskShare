@@ -17,12 +17,11 @@ SocketListener::SocketListener(Network *nw){
         //QMessageBox::critical(this, tr("Opening socket"), tr("Unable to start server: %1.").arg(tcpServer->errorString()));
         qDebug("unable to start server");
         //close();
-        return;
+    }else{
+        qDebug() << "Server started\tPORT : " << this->tcpServer->serverPort();
+
+        QObject::connect(tcpServer, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
     }
-
-    qDebug() << "Server started\tPORT : " << this->tcpServer->serverPort();
-
-    QObject::connect(tcpServer, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
 }
 
 SocketListener::SocketListener(int port, Network *nw){
@@ -32,12 +31,11 @@ SocketListener::SocketListener(int port, Network *nw){
         //QMessageBox::critical(this, tr("Opening socket"), tr("Unable to start server: %1.").arg(tcpServer->errorString()));
         qDebug("unable to start server");
         //close();
-        return;
+    }else{
+        qDebug() << "Server started\tPORT : " << this->tcpServer->serverPort();
+
+        QObject::connect(tcpServer, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
     }
-
-    qDebug() << "Server started\tPORT : " << this->tcpServer->serverPort();
-
-    QObject::connect(tcpServer, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
 }
 // http://doc.qt.io/qt-5/qtnetwork-fortuneserver-example.html
 
@@ -75,30 +73,6 @@ void SocketListener::handleRequest(){   //in displayRequest steken
     // wat als input niet in juiste formaat??
     // als formaat nie juist is, treedt geen error op, hij vult gewoon in zo goed als mogelijk (maar het is wel verkeerd)
 
-    //TODO: vervangen door event enveloppe
-
-    /*qint32 type;
-
-    inType >> type;
-
-    Event* event;
-
-    switch((Event::Type)type){
-    case Event::CHAT:
-        event = new ChatEvent();
-        break;
-    case Event::FILE:
-
-        break;
-    default:
-        event = new Event();
-    }
-
-    inAll >> *event;
-
-    //in >> ev;
-
-    event->showDebug();*/
 
     EventEnvelope ee = EventEnvelope();
 

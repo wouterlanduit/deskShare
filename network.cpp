@@ -13,9 +13,9 @@ void Network::connect(QTcpSocket* socket){
     this->cn = Connection::construct(socket, this, "EMPTY");
 }
 
-void Network::disconnect(){
+void Network::disconnect(Connection *conn){
     // TODO: verder over nadenken
-    delete cn;
+    delete conn;
 }
 
 void Network::hello(){
